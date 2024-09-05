@@ -1,8 +1,8 @@
 /* src/Join.css */
 .Join {
     display: flex;
-    flex-direction: column;  /* Si vous voulez que le contenu s'empile verticalement */
-    justify-content: center;  /* Centre le contenu horizontalement */
+    flex-direction: column;
+    justify-content: center;
     text-align: center;
 }
 
@@ -14,3 +14,57 @@
     padding: 2%;
     text-align: center;
 }
+
+.submitButton {
+    color: white;
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+  
+  .submitButton span {
+    color: white;
+    padding-bottom: 7px;
+    letter-spacing: 4px;
+    font-size: 14px;
+    padding-right: 15px;
+  }
+  
+  .submitButton svg {
+    color: white;
+    transform: translateX(-8px);
+    transition: all 0.3s ease;
+  }
+  
+  .submitButton:hover svg {
+    transform: translateX(0);
+  }
+  
+  .submitButton:active svg {
+    transform: scale(0.9);
+  }
+  
+  .ligne {
+    position: relative;
+    color: white;
+    padding-bottom: 20px;
+  }
+  
+  .ligne:after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: white;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+  }
+  
+  .submitButton:hover .ligne:after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+  }
+  
