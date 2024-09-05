@@ -14,7 +14,7 @@ function Play() {
 
     // Envoi des données vers le serveur PHP
     try {
-      const response = await fetch('http://localhost/connexion.php', {
+      const response = await fetch('http://192.168.1.63/connexion.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
