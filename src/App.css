@@ -1,7 +1,8 @@
-.App {
-  text-align: center;
+/* src/App.css */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
@@ -10,26 +11,27 @@
 }
 
 h1 {
-  font-size: 3rem;
-  margin-bottom: 2rem;
+  margin-bottom: 20px;
 }
 
-.buttons-container {
-  display: flex;
-  flex-direction: column;
-}
-
-button {
-  margin: 1rem 0;
-  padding: 1rem 2rem;
-  font-size: 1.5rem;
+.menu-button {
+  display: block;
+  padding: 10px 20px;
+  margin: 10px 0;
+  font-size: 18px;
+  color: white;
+  background-color: #61dafb;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  background-color: #61dafb;
-  color: white;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-button:hover {
+.menu-button:hover {
   background-color: #21a1f1;
+}
+
+.home, .play {
+  text-align: center;
 }

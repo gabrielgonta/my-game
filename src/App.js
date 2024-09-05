@@ -1,18 +1,19 @@
+// src/App.js
 import React from 'react';
-import LocalButton from './components/LocalButton';
-import MultiButton from './components/MultiButton';
-import SettingsButton from './components/SettingsButton';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Home from './Home';
+import Play from './Play';
 
 function App() {
   return (
-    <div className="App">
-      <h1>Battle Royale 2D</h1>
-      <div className="buttons-container">
-        <LocalButton />
-        <MultiButton />
-        <SettingsButton />
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/play" element={<Play />} />
+        </Routes>
       </div>
-    </div>
+    </Router>
   );
 }
 
