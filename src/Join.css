@@ -1,0 +1,16 @@
+/* src/Join.css */
+.Join {
+    display: flex;
+    flex-direction: column;  /* Si vous voulez que le contenu s'empile verticalement */
+    justify-content: center;  /* Centre le contenu horizontalement */
+    text-align: center;
+}
+
+.Join input {
+    text-transform: uppercase;
+    margin-top: 25%;
+    font-size: 300%;
+    font-weight: bold;
+    padding: 2%;
+    text-align: center;
+}

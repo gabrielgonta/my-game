@@ -10,7 +10,7 @@ function Home() {
     <div className="home">
       <h1>Battle Royale 2D</h1>
       <button className="menu-button" onClick={() => navigate('/play')}>Jouer</button>
-      <button className="menu-button">Settings</button>
+      <button className="menu-button" onClick={() => navigate('/settings')}>Settings</button>
     </div>
   );
 }
