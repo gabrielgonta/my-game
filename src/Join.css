@@ -1,70 +1,162 @@
 /* src/Join.css */
-.Join {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
+.Join .container {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-style: italic;
+  font-weight: bold;
+  font-size: 1.6em;
+  display: grid;
+  place-content: center;
+  width: 400px;
+  margin-top: 2.5%;
+  margin-left: 18.5%;
 }
 
-.Join input {
-    text-transform: uppercase;
-    margin-top: 25%;
-    font-size: 300%;
-    font-weight: bold;
-    padding: 2%;
-    text-align: center;
+.Join .neon-btn {
+  width:300px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.52m 0.5em;
+  text-align: right;
+  background: transparent;
+  position: relative;
+  overflow: hidden;
+  transition: all 2s ease-in-out;
+  -webkit-clip-path: polygon(6% 0, 93% 0, 100% 8%, 100% 86%, 90% 89%, 88% 100%, 5% 100%, 0% 85%);
+  clip-path: polygon(6% 0, 93% 0, 100% 8%, 100% 86%, 90% 89%, 88% 100%, 5% 100%, 0% 85%);
+}
+
+.Join .neon-btn .span {
+  display: flex;
+  -webkit-clip-path: polygon(6% 0, 93% 0, 100% 8%, 100% 86%, 90% 89%, 88% 100%, 5% 100%, 0% 85%);
+  clip-path: polygon(6% 0, 93% 0, 100% 8%, 100% 86%, 90% 89%, 88% 100%, 5% 100%, 0% 85%);
+  position: absolute;
+  inset: 1px;
+  background-color: #212121;
+  z-index: 1;
+}
+
+.Join .neon-btn .txt {
+  text-align: right;
+  position: relative;
+  z-index: 2;
+  color: aliceblue;
+  font-size: 1em;
+  transition: all ease-in-out 2s linear;
+  text-shadow: 0px 0px 1px #4090b5, 0px 0px 1px #9e30a9, 0 0 1px white;
+}
+
+.Join .neon-btn::before {
+  content: "";
+  position: absolute;
+  height: 300px;
+  aspect-ratio: 1.5/1;
+  box-shadow: -17px -19px 20px #9e30a9;
+  background-image: conic-gradient(#9e30a9, transparent, transparent, transparent, transparent, transparent, transparent, #9e30a9);
+  animation: rotate 2s linear infinite -1s;
+}
+
+.Join .neon-btn::after {
+  content: "";
+  position: absolute;
+  height: 300px;
+  aspect-ratio: 1.5/1;
+  box-shadow: -17px -19px 10px #4090b5;
+  background-image: conic-gradient(#4090b5, transparent, transparent, transparent, transparent, transparent, transparent, transparent, #4090b5);
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.Join {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.Join .code {
+  text-transform: uppercase;
+  margin-top: 10%;
+  font-size: 300%;
+  font-weight: bold;
+  padding: 2%;
+  text-align: center;
+}
+
+.Join .name {
+  margin-top: 20%;
+  font-size: 300%;
+  font-weight: bold;
+  padding: 2%;
+  text-align: center;
 }
 
 .submitButton {
-    color: white;
-    border: none;
-    background: none;
-    cursor: pointer;
-  }
+  color: white;
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: absolute;
+  top: 54%;
+  left: 72%;
+}
   
-  .submitButton span {
-    color: white;
-    padding-bottom: 7px;
-    letter-spacing: 4px;
-    font-size: 14px;
-    padding-right: 15px;
-  }
+.submitButton span {
+  color: white;
+  padding-bottom: 15%;
+  letter-spacing: 0.4em;
+  font-size: 1.5em;
+  padding-right: 15px;
+}
   
-  .submitButton svg {
-    color: white;
-    transform: translateX(-8px);
-    transition: all 0.3s ease;
-  }
+.submitButton svg {
+  color: white;
+  transform: translateX(-8px);
+  transition: all 0.3s ease;
+}
   
-  .submitButton:hover svg {
-    transform: translateX(0);
-  }
+.submitButton:hover svg {
+  transform: translateX(0);
+}
   
-  .submitButton:active svg {
-    transform: scale(0.9);
-  }
+.submitButton:active svg {
+  transform: scale(0.9);
+}
   
-  .ligne {
-    position: relative;
-    color: white;
-    padding-bottom: 20px;
-  }
+.ligne {
+  position: relative;
+  color: white;
+  padding-bottom: 20px;
+}
   
-  .ligne:after {
-    content: "";
-    position: absolute;
-    width: 100%;
-    transform: scaleX(0);
-    height: 2px;
-    bottom: 0;
-    left: 0;
-    background-color: white;
-    transform-origin: bottom right;
-    transition: transform 0.25s ease-out;
-  }
+.ligne:after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: white;
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
   
-  .submitButton:hover .ligne:after {
-    transform: scaleX(1);
-    transform-origin: bottom left;
-  }
+.submitButton:hover .ligne:after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
   
+.Join .menu-button {
+  margin-top: 10%;
+}

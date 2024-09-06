@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ref, set } from 'firebase/database';
 import { database } from './firebaseConfig';
+import './Create.css';
 
 function generateRoomCode() {
   // Générer un code aléatoire de 6 caractères
@@ -44,13 +45,13 @@ function Create() {
 
   return (
     <div className="create">
-      <h1>Créer un salon</h1>
-      <input
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        placeholder="Entrez votre nom d’utilisateur"
-        type="text"
-      />
+    <form class="container">
+        <label class="neon-btn">
+            <span class="span"></span>
+            <span class="txt">CRÉER UN SALON</span>
+        </label>
+    </form>
+      <input value={username} className='name' onChange={(e) => setUsername(e.target.value)} placeholder="PSEUDO" type="text"/>
       <button className="menu-button" onClick={handleCreateRoom}>
         Continuer
       </button>

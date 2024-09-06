@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ref, get, update } from 'firebase/database';
 import { database } from './firebaseConfig';
+import './Join.css';
 
 function Join() {
   const [code, setCode] = useState('');
@@ -48,13 +49,21 @@ function Join() {
 
   return (
     <div className="Join">
-      <h1>Rejoindre</h1>
-      <input value={code} onChange={handleChange} placeholder="Code du salon" type="text" maxLength={6} />
-      <input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Nom d'utilisateur" type="text" />
+    <form class="container">
+        <label class="neon-btn">
+            <span class="span"></span>
+            <span class="txt">REJOINDRE</span>
+        </label>
+    </form>
+      <input value={username} className='name' onChange={(e) => setUsername(e.target.value)} placeholder="PSEUDO" type="text" />
+      <input value={code} className='code' onChange={handleChange} placeholder="Code du salon" type="text" maxLength={6} />
 
       {showButton && (
         <button className="submitButton" onClick={handleJoinRoom}>
-          Valider
+          <span class='ligne'>VALIDER</span>
+          <svg width="30" height="10" viewBox="0 0 46 16">
+            <path d="M8,0,6.545,1.455l5.506,5.506H-30V9.039H12.052L6.545,14.545,8,16l8-8Z" fill='white' transform="translate(30)"></path>
+          </svg>
         </button>
       )}
       <button className="menu-button" onClick={() => navigate(-1)}>Retour</button>
