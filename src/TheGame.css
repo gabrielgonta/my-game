@@ -1,0 +1,13 @@
+.player img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  }
+  .game-board {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .player {
+    margin: 10px;
+    text-align: center;
+  }

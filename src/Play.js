@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import SignupPopup from './SignupPopup';
 import './App.css';
 
-
 function Play() {
   const navigate = useNavigate();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -20,8 +19,8 @@ function Play() {
   return (
     <div className="play">
       <h1>Choisissez une option</h1>
-      <button className="menu-button">Créer</button>
-      <button className="menu-button">Rejoindre</button>
+      <button className="menu-button" onClick={() => navigate('/create')}>Créer</button> {/* Redirection vers Create */}
+      <button className="menu-button" onClick={() => navigate('/join')}>Rejoindre</button>
       <button className="menu-button" onClick={openPopup}>Multijoueur</button>
       <button className="menu-button" onClick={() => navigate(-1)}>Retour</button>
       
@@ -32,3 +31,4 @@ function Play() {
 }
 
 export default Play;
+

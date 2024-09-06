@@ -35,3 +35,12 @@ h1 {
 .home, .play {
   text-align: center;
 }
+
+.badge {
+  background-color: #ffcc00;
+  color: #000;
+  border-radius: 3px;
+  padding: 2px 5px;
+  font-size: 0.75em;
+  margin-left: 5px;
+}
