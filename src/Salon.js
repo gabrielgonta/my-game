@@ -31,9 +31,9 @@ function Salon() {
 
   useEffect(() => {
     if (!currentUser) return; // Ne pas continuer si l'utilisateur n'est pas autorisé
-
+  
     const roomRef = ref(database, `rooms/${code}/users`);
-
+  
     // Écouter les mises à jour des utilisateurs dans le salon
     onValue(roomRef, (snapshot) => {
       const data = snapshot.val();
@@ -41,66 +41,51 @@ function Salon() {
         setUsers(Object.values(data));
       }
     });
-
+  
     const gameRef = ref(database, `rooms/${code}/gameStarted`);
     onValue(gameRef, (snapshot) => {
       if (snapshot.exists() && snapshot.val() === true) {
-        navigate('/loading', { state: { code } });
+        navigate('/loading', { state: { code, users, currentUser } }); // Transmettre les données du salon à Loading.js
       }
     });
-  }, [code, currentUser, navigate]);
+  
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [code, currentUser, navigate]);  
 
-  const handleLeaveRoom = () => {
+  const handleLeaveRoom = async () => {
     if (!currentUser) return;
 
     const userRef = ref(database, `rooms/${code}/users/${currentUser}`);
+    const roomRef = ref(database, `rooms/${code}`);
+    try {
+      await remove(userRef); // Supprimer l'utilisateur du salon
 
-    // Supprimer l'utilisateur du salon
-    remove(userRef)
-      .then(() => {
-        // Rediriger vers la page d'accueil ou une autre page après avoir quitté
-        navigate('/');
-      })
-      .catch((error) => {
-        console.error('Erreur lors de la déconnexion :', error);
-      });
+      // Vérifier si le salon est maintenant vide
+      const usersSnapshot = await get(ref(database, `rooms/${code}/users`));
+      if (!usersSnapshot.exists() || Object.keys(usersSnapshot.val()).length === 0) {
+        await remove(roomRef); // Supprimer le salon s'il est vide
+      }
+
+      navigate('/'); // Rediriger vers la page d'accueil ou une autre page après avoir quitté
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion :', error);
+    }
   };
 
   const handleStartGame = () => {
-        if (!isAdmin) return;
-
-        const roomRef = ref(database, `rooms/${code}`);
-
-        // Liste des skins disponibles
-        const skins = ['skin1.png', 'skin2.png', 'skin3.png', 'skin4.png', 'skin5.png'];
-
-        // Préparer l'état des skins utilisés
-        const usedSkins = {};
-
-        // Pour chaque utilisateur, assigner un skin unique
-        users.forEach(user => {
-            let skinAssigned = false;
-            while (!skinAssigned) {
-                const randomIndex = Math.floor(Math.random() * skins.length);
-                const chosenSkin = skins[randomIndex];
-                if (!Object.values(usedSkins).includes(chosenSkin)) {
-                    usedSkins[user.username] = chosenSkin;
-                    skinAssigned = true;
-                }
-            }
-        });
-
-        // Mettre à jour l'état du salon et des utilisateurs
-        update(roomRef, { 
-            gameStarted: true, 
-            usedSkins 
-        }).then(() => {
-            navigate('/loading', { state: { code } });
-        }).catch((error) => {
-            console.error('Erreur lors du démarrage du jeu :', error);
-        });
-    };
-
+    if (!isAdmin) return;
+  
+    // Mettre à jour l'état du salon pour indiquer que le jeu a commencé
+    const roomRef = ref(database, `rooms/${code}`);
+    update(roomRef, { gameStarted: true })
+      .then(() => {
+        // Transmettre currentUser en plus du code et des utilisateurs
+        navigate('/loading', { state: { code, users, currentUser } });
+      })
+      .catch((error) => {
+        console.error('Erreur lors du démarrage du jeu :', error);
+      });
+  };
 
   return (
     <div className="salon">

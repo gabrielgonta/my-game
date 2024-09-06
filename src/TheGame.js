@@ -1,49 +1,47 @@
 // src/TheGame.js
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ref, onValue } from 'firebase/database';
 import { database } from './firebaseConfig';
-import './TheGame.css';
 
 function TheGame() {
   const location = useLocation();
-  const { code } = location.state || {};
-  const [players, setPlayers] = useState([]);
-  const [skins, setSkins] = useState({});
+  const navigate = useNavigate();
+  const { code, users: initialUsers, currentUser } = location.state || {};
+
+  const [users, setUsers] = useState(initialUsers || []); // Initialiser avec une valeur par défaut
 
   useEffect(() => {
-    if (!code) return;
+    if (!code) {
+      navigate('/'); // Rediriger si le code est manquant
+      return;
+    }
 
-    const roomRef = ref(database, `rooms/${code}`);
-
-    // Écouter les informations du salon
-    onValue(roomRef, (snapshot) => {
+    // Écouter les mises à jour des utilisateurs en temps réel
+    const roomRef = ref(database, `rooms/${code}/users`);
+    const unsubscribe = onValue(roomRef, (snapshot) => {
       const data = snapshot.val();
-      if (data && data.usedSkins) {
-        setSkins(data.usedSkins);
-
-        // Récupérer les informations des joueurs
-        const users = Object.keys(data.usedSkins).map(username => ({
-          username,
-          skin: data.usedSkins[username]
-        }));
-        setPlayers(users);
+      if (data) {
+        setUsers(Object.values(data));
       }
     });
-  }, [code]);
+
+    return () => unsubscribe(); // Se désabonner du listener lorsqu'on quitte la page
+  }, [code, navigate]);
 
   return (
-    <div className="the-game">
-      <h1>La Partie</h1>
-      <div className="players">
-        {players.map((player, index) => (
-          <div key={index} className="player">
-            <img src={`/assets/${player.skin}`} alt={`Skin de ${player.username}`} />
-            <p>{player.username}</p>
-          </div>
+    <div className="thegame">
+      <h1>Bienvenue {currentUser}</h1> {/* Afficher le nom d'utilisateur */}
+      {code && <h2>Salon : {code}</h2>}
+      <h3>Membres du salon :</h3>
+      <ul>
+        {users.map((user, index) => (
+          <li key={index}>
+            {user.username}
+            {user.isAdmin && <span className="badge">Admin</span>}
+          </li>
         ))}
-      </div>
-      {/* Ton contenu de jeu va ici */}
+      </ul>
     </div>
   );
 }

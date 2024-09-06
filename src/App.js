@@ -7,8 +7,8 @@ import Settings from './Settings';
 import Join from './Join';
 import Create from './Create';
 import Multi from './Multi';
-import Salon from './Salon';
 import Loading from './Loading';
+import Salon from './Salon';
 import TheGame from './TheGame';
 import SignupPopup from './SignupPopup';  // Importer le composant de la popup
 
@@ -25,8 +25,8 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/create" element={<Create />} />
           <Route path="/multi" element={<Multi />} />
-          <Route path="/salon/:code" element={<Salon />} />
           <Route path="/loading" element={<Loading />} />
+          <Route path="/salon/:code" element={<Salon />} />
           <Route path="/thegame" element={<TheGame />} />
         </Routes>
         {/* Afficher la popup si showPopup est true */}

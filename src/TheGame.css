@@ -1,21 +1,36 @@
 /* src/TheGame.css */
-.the-game {
-    text-align: center;
+
+.game {
+    padding: 20px;
   }
   
-  .players {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+  .game-info {
+    margin-bottom: 20px;
   }
   
-  .player {
-    margin: 10px;
+  .game-info p {
+    font-size: 1.2rem;
   }
   
-  .player img {
-    width: 100px; /* Ajuste selon tes besoins */
-    height: 100px;
-    object-fit: cover;
+  .game-info h2 {
+    margin-top: 10px;
+  }
+  
+  .game-info ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .game-info li {
+    padding: 5px 0;
+  }
+  
+  .badge {
+    background-color: #ffcc00;
+    border-radius: 5px;
+    color: #000;
+    font-size: 0.8rem;
+    margin-left: 10px;
+    padding: 3px 5px;
   }
   
