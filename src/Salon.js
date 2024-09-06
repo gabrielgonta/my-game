@@ -67,19 +67,40 @@ function Salon() {
   };
 
   const handleStartGame = () => {
-    if (!isAdmin) return;
+        if (!isAdmin) return;
 
-    // Mettre à jour l'état du salon pour indiquer que le jeu a commencé
-    const roomRef = ref(database, `rooms/${code}`);
-    update(roomRef, { gameStarted: true })
-      .then(() => {
-        // Rediriger vers la page de chargement
-        navigate('/loading', { state: { code } });
-      })
-      .catch((error) => {
-        console.error('Erreur lors du démarrage du jeu :', error);
-      });
-  };
+        const roomRef = ref(database, `rooms/${code}`);
+
+        // Liste des skins disponibles
+        const skins = ['skin1.png', 'skin2.png', 'skin3.png', 'skin4.png', 'skin5.png'];
+
+        // Préparer l'état des skins utilisés
+        const usedSkins = {};
+
+        // Pour chaque utilisateur, assigner un skin unique
+        users.forEach(user => {
+            let skinAssigned = false;
+            while (!skinAssigned) {
+                const randomIndex = Math.floor(Math.random() * skins.length);
+                const chosenSkin = skins[randomIndex];
+                if (!Object.values(usedSkins).includes(chosenSkin)) {
+                    usedSkins[user.username] = chosenSkin;
+                    skinAssigned = true;
+                }
+            }
+        });
+
+        // Mettre à jour l'état du salon et des utilisateurs
+        update(roomRef, { 
+            gameStarted: true, 
+            usedSkins 
+        }).then(() => {
+            navigate('/loading', { state: { code } });
+        }).catch((error) => {
+            console.error('Erreur lors du démarrage du jeu :', error);
+        });
+    };
+
 
   return (
     <div className="salon">
