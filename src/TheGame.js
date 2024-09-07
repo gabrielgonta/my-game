@@ -3,7 +3,23 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ref, onValue, remove, get, update } from 'firebase/database';
 import { database } from './firebaseConfig';
-import './TheGame.css'; // Assurez-vous d'avoir ce fichier CSS pour styliser la carte et les ronds
+import './TheGame.css'; // Assurez-vous d'avoir ce fichier CSS pour styliser la carte et les skins
+
+// Importer les images des skins
+import skin1 from './assets/skin1.png';
+import skin2 from './assets/skin2.png';
+import skin3 from './assets/skin3.png';
+import skin4 from './assets/skin4.png';
+import skin5 from './assets/skin5.png';
+
+// Associer chaque skin à un numéro
+const skinImages = {
+  1: skin1,
+  2: skin2,
+  3: skin3,
+  4: skin4,
+  5: skin5,
+};
 
 function TheGame() {
   const location = useLocation();
@@ -19,13 +35,30 @@ function TheGame() {
       return;
     }
 
+    // Assigner un skin aléatoire à un utilisateur s'il n'en a pas encore
+    const assignSkin = async (username) => {
+      const userRef = ref(database, `rooms/${code}/users/${username}`);
+      const snapshot = await get(userRef);
+      const userData = snapshot.val();
+      if (!userData.skin) {
+        // Assigner un skin aléatoire entre 1 et 5
+        const randomSkin = Math.floor(Math.random() * 5) + 1;
+        await update(userRef, { skin: randomSkin });
+      }
+    };
+
     // Écouter les mises à jour des utilisateurs en temps réel
     const roomRef = ref(database, `rooms/${code}/users`);
-    const unsubscribe = onValue(roomRef, (snapshot) => {
+    const unsubscribe = onValue(roomRef, async (snapshot) => {
       const data = snapshot.val();
       if (data) {
         const updatedUsers = Object.values(data);
         setUsers(updatedUsers);
+
+        // Assigner un skin à chaque utilisateur s'il n'en a pas encore
+        for (const user of updatedUsers) {
+          await assignSkin(user.username);
+        }
 
         // Mettre à jour les positions des utilisateurs restants
         const updatedPositions = {};
@@ -127,19 +160,26 @@ function TheGame() {
       {code && <h2>Salon : {code}</h2>}
 
       <div className="map">
-        {Object.keys(positions).map((username) => (
-          <div
-            key={username}
-            className="player-dot"
-            style={{
-              left: `${positions[username].x}px`,
-              top: `${positions[username].y}px`,
-              backgroundColor: username === currentUser ? 'blue' : 'red', // Couleur différente pour le joueur actuel
-            }}
-          >
-            {username}
-          </div>
-        ))}
+        {Object.keys(positions).map((username) => {
+          // Déterminer le skin de l'utilisateur
+          const userSkin = users.find(user => user.username === username)?.skin || 1; // Utiliser skin 1 par défaut
+
+          return (
+            <img
+              key={username}
+              src={skinImages[userSkin]} // Utiliser l'image correspondant au skin
+              alt={username}
+              className="player-skin"
+              style={{
+                left: `${positions[username].x}px`,
+                top: `${positions[username].y}px`,
+                position: 'absolute',
+                width: '30px', // Ajustez la taille selon vos besoins
+                height: '30px', // Ajustez la taille selon vos besoins
+              }}
+            />
+          );
+        })}
       </div>
 
       <h3>Membres du salon :</h3>

@@ -85,6 +85,7 @@
   font-weight: bold;
 }
 
+/* src/TheGame.css */
 .thegame {
   text-align: center;
 }
@@ -99,15 +100,10 @@
   overflow: hidden;
 }
 
-.player-dot {
+.player-skin {
   position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 12px;
+  width: 30px; /* Ajustez la taille en fonction de vos images */
+  height: 30px; /* Ajustez la taille en fonction de vos images */
 }
+
 
