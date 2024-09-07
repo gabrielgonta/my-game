@@ -34,3 +34,80 @@
     padding: 3px 5px;
   }
   
+  /* src/TheGame.css */
+.map {
+  width: 600px;
+  height: 600px;
+  background-color: #f0f0f0; /* Une carte blanche */
+  border: 2px solid #000;
+  position: relative;
+  margin: 20px auto;
+}
+
+.player-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 10px;
+  text-align: center;
+}
+
+/* src/TheGame.css */
+.thegame {
+  text-align: center;
+}
+
+.map {
+  position: relative;
+  width: 500px;
+  height: 500px;
+  border: 1px solid #000;
+  margin: 0 auto;
+  background-color: #fff;
+  margin-bottom: 20px;
+}
+
+.player-dot {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.thegame {
+  text-align: center;
+}
+
+.map {
+  position: relative;
+  width: 600px; /* Ajustez en fonction de la taille souhaitée de la carte */
+  height: 600px; /* Ajustez en fonction de la taille souhaitée de la carte */
+  border: 2px solid black;
+  background-color: white;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.player-dot {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+}
+
