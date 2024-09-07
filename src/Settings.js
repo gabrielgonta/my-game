@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
 import './Settings.css';
@@ -6,10 +6,39 @@ import './Settings.css';
 function Settings() {
     const navigate = useNavigate();
     const [selectedPage, setSelectedPage] = useState('général');
+    const [volume, setVolume] = useState(100);
+    const audioRef = useRef(null);
 
     const handlePageChange = (e) => {
         setSelectedPage(e.target.value);
     };
+
+    const handleVolumeChange = (e) => {
+      setVolume(e.target.value);
+  };
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume / 100; // Convertir le pourcentage en une valeur entre 0 et 1
+    }
+  }, [volume]);
+
+    const renderContent = () => {
+      switch (selectedPage) {
+          case 'général':
+              return <p>Paramètres généraux : ici vous pouvez modifier les paramètres de base de votre application.</p>;
+          case 'contrôles':
+              return <p>Paramètres des contrôles : ajustez les contrôles selon vos préférences.</p>;
+          case 'vidéo':
+              return <p>Paramètres vidéo : ajustez la qualité vidéo et les résolutions.</p>;
+          case 'audio':
+              return <div>
+                        <label htmlFor="volume">Volume :</label>
+                        <input id="volume" type="range" min="0" max="100" value={volume} onChange={handleVolumeChange}/>
+                        <span>{volume}%</span>
+                      </div>;
+      }
+  };
 
     return (
       <div className="settings">
@@ -38,7 +67,9 @@ function Settings() {
           </label>
         </params>
         <div className='values'>
-          <b></b>
+          <b>
+            {renderContent()}
+          </b>
         </div>
         <form className="container">
             <label className="neon-btn">

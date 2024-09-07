@@ -1,5 +1,5 @@
 // src/App.js
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './Home';
 import Play from './Play';
@@ -14,10 +14,19 @@ import SignupPopup from './SignupPopup';  // Importer le composant de la popup
 
 function App() {
   const [showPopup, setShowPopup] = useState(false);
+  const audioRef = useRef(null);
+  const [volume, setVolume] = useState(100);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume / 100; // Convertir le pourcentage en une valeur entre 0 et 1
+    }
+  }, [volume]);
 
   return (
     <Router>
       <div className="App">
+      <audio autoPlay loop ref={audioRef} src='https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' controls></audio>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/play" element={<Play />} />
