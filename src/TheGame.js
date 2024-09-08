@@ -29,6 +29,15 @@ function TheGame() {
   const [users, setUsers] = useState([]);
   const [positions, setPositions] = useState({});
   const [healths, setHealths] = useState({}); // Stocker les points de vie
+  const [mapPosition, setMapPosition] = useState({ x: 0, y: 0 }); // Position de la carte
+
+  // Limites de la carte
+  const MAP_WIDTH = 2000; // Largeur de la carte en pixels
+  const MAP_HEIGHT = 2000; // Hauteur de la carte en pixels
+  const VIEWPORT_WIDTH = 750; // Largeur de la vue
+  const VIEWPORT_HEIGHT = 750; // Hauteur de la vue
+  const MARGIN = 100; // Marge avant de déplacer la carte
+  const SKIN_SIZE = 70; // Taille du skin en pixels
 
   useEffect(() => {
     if (!code) {
@@ -70,8 +79,8 @@ function TheGame() {
           } else {
             // Si l'utilisateur n'a pas de position, en créer une aléatoire
             const newPosition = {
-              x: Math.floor(Math.random() * 500),
-              y: Math.floor(Math.random() * 500)
+              x: Math.floor(Math.random() * MAP_WIDTH),
+              y: Math.floor(Math.random() * MAP_HEIGHT)
             };
             update(ref(database, `rooms/${code}/users/${user.username}/position`), newPosition);
             updatedPositions[user.username] = newPosition;
@@ -117,22 +126,45 @@ function TheGame() {
       const userRef = ref(database, `rooms/${code}/users/${currentUser}/position`);
       const speed = 10; // Vitesse de déplacement
 
+      let newX = positions[currentUser]?.x;
+      let newY = positions[currentUser]?.y;
+
       switch (event.key) {
         case 'z': // Déplacer vers le haut
-          update(userRef, { y: positions[currentUser]?.y - speed });
+          newY = (newY - speed >= 0) ? newY - speed : 0;
           break;
         case 's': // Déplacer vers le bas
-          update(userRef, { y: positions[currentUser]?.y + speed });
+          newY = (newY + speed <= MAP_HEIGHT - SKIN_SIZE) ? newY + speed : MAP_HEIGHT - SKIN_SIZE;
           break;
         case 'q': // Déplacer vers la gauche
-          update(userRef, { x: positions[currentUser]?.x - speed });
+          newX = (newX - speed >= 0) ? newX - speed : 0;
           break;
         case 'd': // Déplacer vers la droite
-          update(userRef, { x: positions[currentUser]?.x + speed });
+          newX = (newX + speed <= MAP_WIDTH - SKIN_SIZE) ? newX + speed : MAP_WIDTH - SKIN_SIZE;
           break;
         default:
           break;
       }
+
+      update(userRef, { x: newX, y: newY });
+
+      // Mettre à jour la position de la carte pour suivre le joueur
+      let newMapX = mapPosition.x;
+      let newMapY = mapPosition.y;
+
+      if (newX < mapPosition.x + MARGIN) {
+        newMapX = Math.max(newX - MARGIN, 0);
+      } else if (newX > mapPosition.x + VIEWPORT_WIDTH - MARGIN - SKIN_SIZE) {
+        newMapX = Math.min(newX - VIEWPORT_WIDTH + MARGIN + SKIN_SIZE, MAP_WIDTH - VIEWPORT_WIDTH);
+      }
+
+      if (newY < mapPosition.y + MARGIN) {
+        newMapY = Math.max(newY - MARGIN, 0);
+      } else if (newY > mapPosition.y + VIEWPORT_HEIGHT - MARGIN - SKIN_SIZE) {
+        newMapY = Math.min(newY - VIEWPORT_HEIGHT + MARGIN + SKIN_SIZE, MAP_HEIGHT - VIEWPORT_HEIGHT);
+      }
+
+      setMapPosition({ x: newMapX, y: newMapY });
     };
 
     window.addEventListener('keydown', handleKeyPress);
@@ -140,7 +172,7 @@ function TheGame() {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [code, currentUser, positions]);
+  }, [code, currentUser, positions, mapPosition]);
 
   const handleLeaveRoom = async () => {
     if (!currentUser) return;
@@ -164,17 +196,28 @@ function TheGame() {
   };
 
   return (
-    <div className="thegame">
+    <div className="thegame" style={{ position: 'relative', overflow: 'hidden' }}>
       <h1>Bienvenue {currentUser}</h1>
       {code && <h2>Salon : {code}</h2>}
 
-      <div className="map">
+      <div className="map" style={{ 
+        position: 'relative', 
+        width: `${VIEWPORT_WIDTH}px`, 
+        height: `${VIEWPORT_HEIGHT}px`, 
+        backgroundImage: `url(${require('./assets/map.png')})`,
+        backgroundSize: `${MAP_WIDTH}px ${MAP_HEIGHT}px`,
+        backgroundPosition: `-${mapPosition.x}px -${mapPosition.y}px`
+      }}>
         {Object.keys(positions).map((username) => {
           const userSkin = users.find(user => user.username === username)?.skin || 1; // Utiliser skin 1 par défaut
           const userHealth = healths[username] || 100;
 
           return (
-            <div key={username} className="player-container" style={{ position: 'absolute', left: `${positions[username].x}px`, top: `${positions[username].y}px` }}>
+            <div key={username} className="player-container" style={{ 
+              position: 'absolute', 
+              left: `${positions[username].x - mapPosition.x}px`, 
+              top: `${positions[username].y - mapPosition.y}px` 
+            }}>
               <div className="health-bar" style={{ width: '50px', height: '5px', backgroundColor: '#ccc' }}>
                 <div className="health" style={{ width: `${userHealth}%`, height: '100%', backgroundColor: 'green' }}></div>
               </div>
@@ -183,8 +226,8 @@ function TheGame() {
                 alt={username}
                 className="player-skin"
                 style={{
-                  width: '30px', // Ajustez la taille selon vos besoins
-                  height: '30px', // Ajustez la taille selon vos besoins
+                  width: `60px`, 
+                  height: `60px`,
                 }}
               />
             </div>
