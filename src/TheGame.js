@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ref, onValue, remove, get, update } from 'firebase/database';
 import { database } from './firebaseConfig';
-import './TheGame.css'; // Assurez-vous d'avoir ce fichier CSS pour styliser la carte et les skins
+import './TheGame.css'; // Assurez-vous d'avoir ce fichier CSS pour styliser la carte, les skins et les barres de vie
 
 // Importer les images des skins
 import skin1 from './assets/skin1.png';
@@ -28,6 +28,7 @@ function TheGame() {
 
   const [users, setUsers] = useState([]);
   const [positions, setPositions] = useState({});
+  const [healths, setHealths] = useState({}); // Stocker les points de vie
 
   useEffect(() => {
     if (!code) {
@@ -35,15 +36,15 @@ function TheGame() {
       return;
     }
 
-    // Assigner un skin aléatoire à un utilisateur s'il n'en a pas encore
-    const assignSkin = async (username) => {
+    // Assigner un skin aléatoire et une barre de vie à un utilisateur s'il n'en a pas encore
+    const assignSkinAndHealth = async (username) => {
       const userRef = ref(database, `rooms/${code}/users/${username}`);
       const snapshot = await get(userRef);
       const userData = snapshot.val();
+
       if (!userData.skin) {
-        // Assigner un skin aléatoire entre 1 et 5
         const randomSkin = Math.floor(Math.random() * 5) + 1;
-        await update(userRef, { skin: randomSkin });
+        await update(userRef, { skin: randomSkin, health: 100 }); // Ajouter une santé initiale de 100
       }
     };
 
@@ -55,13 +56,14 @@ function TheGame() {
         const updatedUsers = Object.values(data);
         setUsers(updatedUsers);
 
-        // Assigner un skin à chaque utilisateur s'il n'en a pas encore
+        // Assigner un skin et une santé à chaque utilisateur s'il n'en a pas encore
         for (const user of updatedUsers) {
-          await assignSkin(user.username);
+          await assignSkinAndHealth(user.username);
         }
 
-        // Mettre à jour les positions des utilisateurs restants
+        // Mettre à jour les positions et la santé des utilisateurs restants
         const updatedPositions = {};
+        const updatedHealths = {};
         updatedUsers.forEach((user) => {
           if (user.position) {
             updatedPositions[user.username] = user.position;
@@ -74,23 +76,30 @@ function TheGame() {
             update(ref(database, `rooms/${code}/users/${user.username}/position`), newPosition);
             updatedPositions[user.username] = newPosition;
           }
+          updatedHealths[user.username] = user.health || 100; // Assigner une santé par défaut de 100
         });
         setPositions(updatedPositions);
+        setHealths(updatedHealths);
       }
     });
 
-    // Écouter les mises à jour des positions en temps réel
+    // Écouter les mises à jour des positions et de la santé en temps réel
     const positionsRef = ref(database, `rooms/${code}/users`);
     const unsubscribePositions = onValue(positionsRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
         const updatedPositions = {};
+        const updatedHealths = {};
         Object.keys(data).forEach((username) => {
           if (data[username].position) {
             updatedPositions[username] = data[username].position;
           }
+          if (data[username].health !== undefined) {
+            updatedHealths[username] = data[username].health;
+          }
         });
         setPositions(updatedPositions);
+        setHealths(updatedHealths);
       }
     });
 
@@ -161,26 +170,37 @@ function TheGame() {
 
       <div className="map">
         {Object.keys(positions).map((username) => {
-          // Déterminer le skin de l'utilisateur
           const userSkin = users.find(user => user.username === username)?.skin || 1; // Utiliser skin 1 par défaut
+          const userHealth = healths[username] || 100;
 
           return (
-            <img
-              key={username}
-              src={skinImages[userSkin]} // Utiliser l'image correspondant au skin
-              alt={username}
-              className="player-skin"
-              style={{
-                left: `${positions[username].x}px`,
-                top: `${positions[username].y}px`,
-                position: 'absolute',
-                width: '30px', // Ajustez la taille selon vos besoins
-                height: '30px', // Ajustez la taille selon vos besoins
-              }}
-            />
+            <div key={username} className="player-container" style={{ position: 'absolute', left: `${positions[username].x}px`, top: `${positions[username].y}px` }}>
+              <div className="health-bar" style={{ width: '50px', height: '5px', backgroundColor: '#ccc' }}>
+                <div className="health" style={{ width: `${userHealth}%`, height: '100%', backgroundColor: 'green' }}></div>
+              </div>
+              <img
+                src={skinImages[userSkin]} // Utiliser l'image correspondant au skin
+                alt={username}
+                className="player-skin"
+                style={{
+                  width: '30px', // Ajustez la taille selon vos besoins
+                  height: '30px', // Ajustez la taille selon vos besoins
+                }}
+              />
+            </div>
           );
         })}
       </div>
+
+      {/* Grande barre de vie en haut à droite pour l'utilisateur actuel */}
+      {currentUser && (
+        <div className="large-health-bar-container">
+          <h3>Vie : {healths[currentUser]} / 100</h3>
+          <div className="large-health-bar" style={{ width: '200px', height: '20px', backgroundColor: '#ccc' }}>
+            <div className="health" style={{ width: `${healths[currentUser]}%`, height: '100%', backgroundColor: 'green' }}></div>
+          </div>
+        </div>
+      )}
 
       <h3>Membres du salon :</h3>
       <ul>
