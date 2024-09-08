@@ -1,4 +1,3 @@
-// src/TheGame.js
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ref, onValue, remove, get, update } from 'firebase/database';
@@ -28,24 +27,26 @@ function TheGame() {
 
   const [users, setUsers] = useState([]);
   const [positions, setPositions] = useState({});
-  const [healths, setHealths] = useState({}); // Stocker les points de vie
-  const [mapPosition, setMapPosition] = useState({ x: 0, y: 0 }); // Position de la carte
+  const [healths, setHealths] = useState({});
+  const [projectiles, setProjectiles] = useState([]); // Nouvel état pour les projectiles
+  const [mapPosition, setMapPosition] = useState({ x: 0, y: 0 });
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 }); // Position de la souris
 
-  // Limites de la carte
-  const MAP_WIDTH = 2000; // Largeur de la carte en pixels
-  const MAP_HEIGHT = 2000; // Hauteur de la carte en pixels
-  const VIEWPORT_WIDTH = 750; // Largeur de la vue
-  const VIEWPORT_HEIGHT = 750; // Hauteur de la vue
-  const MARGIN = 100; // Marge avant de déplacer la carte
-  const SKIN_SIZE = 70; // Taille du skin en pixels
+  const MAP_WIDTH = 2000;
+  const MAP_HEIGHT = 2000;
+  const VIEWPORT_WIDTH = 750;
+  const VIEWPORT_HEIGHT = 750;
+  const MARGIN = 100;
+  const SKIN_SIZE = 70;
+  const PROJECTILE_SPEED = 5; // Vitesse du projectile
+  const PROJECTILE_MAX_DISTANCE = 400; // Distance maximale avant disparition
 
   useEffect(() => {
     if (!code) {
-      navigate('/'); // Rediriger si le code est manquant
+      navigate('/');
       return;
     }
 
-    // Assigner un skin aléatoire et une barre de vie à un utilisateur s'il n'en a pas encore
     const assignSkinAndHealth = async (username) => {
       const userRef = ref(database, `rooms/${code}/users/${username}`);
       const snapshot = await get(userRef);
@@ -53,11 +54,10 @@ function TheGame() {
 
       if (!userData.skin) {
         const randomSkin = Math.floor(Math.random() * 5) + 1;
-        await update(userRef, { skin: randomSkin, health: 100 }); // Ajouter une santé initiale de 100
+        await update(userRef, { skin: randomSkin, health: 100 });
       }
     };
 
-    // Écouter les mises à jour des utilisateurs en temps réel
     const roomRef = ref(database, `rooms/${code}/users`);
     const unsubscribe = onValue(roomRef, async (snapshot) => {
       const data = snapshot.val();
@@ -65,19 +65,16 @@ function TheGame() {
         const updatedUsers = Object.values(data);
         setUsers(updatedUsers);
 
-        // Assigner un skin et une santé à chaque utilisateur s'il n'en a pas encore
         for (const user of updatedUsers) {
           await assignSkinAndHealth(user.username);
         }
 
-        // Mettre à jour les positions et la santé des utilisateurs restants
         const updatedPositions = {};
         const updatedHealths = {};
         updatedUsers.forEach((user) => {
           if (user.position) {
             updatedPositions[user.username] = user.position;
           } else {
-            // Si l'utilisateur n'a pas de position, en créer une aléatoire
             const newPosition = {
               x: Math.floor(Math.random() * MAP_WIDTH),
               y: Math.floor(Math.random() * MAP_HEIGHT)
@@ -85,14 +82,13 @@ function TheGame() {
             update(ref(database, `rooms/${code}/users/${user.username}/position`), newPosition);
             updatedPositions[user.username] = newPosition;
           }
-          updatedHealths[user.username] = user.health || 100; // Assigner une santé par défaut de 100
+          updatedHealths[user.username] = user.health || 100;
         });
         setPositions(updatedPositions);
         setHealths(updatedHealths);
       }
     });
 
-    // Écouter les mises à jour des positions et de la santé en temps réel
     const positionsRef = ref(database, `rooms/${code}/users`);
     const unsubscribePositions = onValue(positionsRef, (snapshot) => {
       const data = snapshot.val();
@@ -118,29 +114,62 @@ function TheGame() {
     };
   }, [code, navigate]);
 
-  // Gérer le mouvement du joueur
+  // Capturer la position de la souris
+  useEffect(() => {
+    const handleMouseMove = (event) => {
+      const rect = event.target.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left + mapPosition.x;
+      const mouseY = event.clientY - rect.top + mapPosition.y;
+      setMousePosition({ x: mouseX, y: mouseY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [mapPosition]);
+
+  // Gérer le mouvement du joueur et le tir des projectiles
   useEffect(() => {
     const handleKeyPress = (event) => {
       if (!currentUser) return;
 
       const userRef = ref(database, `rooms/${code}/users/${currentUser}/position`);
-      const speed = 10; // Vitesse de déplacement
+      const speed = 60;
 
       let newX = positions[currentUser]?.x;
       let newY = positions[currentUser]?.y;
 
       switch (event.key) {
-        case 'z': // Déplacer vers le haut
+        case 'z':
           newY = (newY - speed >= 0) ? newY - speed : 0;
           break;
-        case 's': // Déplacer vers le bas
+        case 's':
           newY = (newY + speed <= MAP_HEIGHT - SKIN_SIZE) ? newY + speed : MAP_HEIGHT - SKIN_SIZE;
           break;
-        case 'q': // Déplacer vers la gauche
+        case 'q':
           newX = (newX - speed >= 0) ? newX - speed : 0;
           break;
-        case 'd': // Déplacer vers la droite
+        case 'd':
           newX = (newX + speed <= MAP_WIDTH - SKIN_SIZE) ? newX + speed : MAP_WIDTH - SKIN_SIZE;
+          break;
+        case 'a': // Tirer un projectile vers la souris
+          const playerPos = positions[currentUser];
+          const dx = mousePosition.x - playerPos.x;
+          const dy = mousePosition.y - playerPos.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const velocityX = (dx / distance) * PROJECTILE_SPEED;
+          const velocityY = (dy / distance) * PROJECTILE_SPEED;
+
+          const newProjectile = {
+            x: playerPos.x + SKIN_SIZE / 2, // Centrer le projectile sur le joueur
+            y: playerPos.y + SKIN_SIZE / 2,
+            velocityX: velocityX,
+            velocityY: velocityY,
+            distance: 0 // Initialiser la distance parcourue à 0
+          };
+          setProjectiles((prevProjectiles) => [...prevProjectiles, newProjectile]);
           break;
         default:
           break;
@@ -148,7 +177,6 @@ function TheGame() {
 
       update(userRef, { x: newX, y: newY });
 
-      // Mettre à jour la position de la carte pour suivre le joueur
       let newMapX = mapPosition.x;
       let newMapY = mapPosition.y;
 
@@ -172,31 +200,45 @@ function TheGame() {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [code, currentUser, positions, mapPosition]);
+  }, [code, currentUser, positions, mapPosition, mousePosition]);
+
+  // Déplacer les projectiles
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setProjectiles((prevProjectiles) =>
+        prevProjectiles
+          .map((proj) => ({
+            ...proj,
+            x: proj.x + proj.velocityX,
+            y: proj.y + proj.velocityY,
+            distance: proj.distance + PROJECTILE_SPEED
+          }))
+          .filter((proj) => proj.distance < PROJECTILE_MAX_DISTANCE)
+      );
+    }, 1000 / 60); // 60 FPS
+
+    return () => clearInterval(intervalId);
+  }, []);
 
   const handleLeaveRoom = async () => {
-    if (!currentUser) return;
-
-    const userRef = ref(database, `rooms/${code}/users/${currentUser}`);
-    const roomRef = ref(database, `rooms/${code}`);
-
     try {
-      await remove(userRef); // Supprimer l'utilisateur du salon
+      const userRef = ref(database, `rooms/${code}/users/${currentUser}`);
+      await remove(userRef);
 
-      // Vérifier si le salon est maintenant vide
-      const usersSnapshot = await get(ref(database, `rooms/${code}/users`));
-      if (!usersSnapshot.exists() || Object.keys(usersSnapshot.val()).length === 0) {
-        await remove(roomRef); // Supprimer le salon s'il est vide
+      const roomRef = ref(database, `rooms/${code}`);
+      const usersSnapshotAfterRemove = await get(ref(database, `rooms/${code}/users`));
+      if (!usersSnapshotAfterRemove.exists()) {
+        await remove(roomRef);
       }
 
-      navigate('/'); // Rediriger vers la page d'accueil ou une autre page après avoir quitté
+      navigate('/');
     } catch (error) {
-      console.error('Erreur lors de la déconnexion :', error);
+      console.error("Erreur lors de la sortie du salon :", error);
     }
   };
 
   return (
-    <div className="thegame" style={{ position: 'relative', overflow: 'hidden' }}>
+    <div className="game-container" style={{ position: 'relative', overflow: 'hidden' }}>
       <h1>Bienvenue {currentUser}</h1>
       {code && <h2>Salon : {code}</h2>}
 
@@ -209,7 +251,7 @@ function TheGame() {
         backgroundPosition: `-${mapPosition.x}px -${mapPosition.y}px`
       }}>
         {Object.keys(positions).map((username) => {
-          const userSkin = users.find(user => user.username === username)?.skin || 1; // Utiliser skin 1 par défaut
+          const userSkin = users.find(user => user.username === username)?.skin || 1;
           const userHealth = healths[username] || 100;
 
           return (
@@ -222,7 +264,7 @@ function TheGame() {
                 <div className="health" style={{ width: `${userHealth}%`, height: '100%', backgroundColor: 'green' }}></div>
               </div>
               <img
-                src={skinImages[userSkin]} // Utiliser l'image correspondant au skin
+                src={skinImages[userSkin]}
                 alt={username}
                 className="player-skin"
                 style={{
@@ -233,9 +275,20 @@ function TheGame() {
             </div>
           );
         })}
+
+        {/* Affichage des projectiles */}
+        {projectiles.map((proj, index) => (
+          <div key={index} className="projectile" style={{ 
+            position: 'absolute', 
+            width: '10px', 
+            height: '10px', 
+            backgroundColor: 'red', 
+            left: `${proj.x - mapPosition.x}px`, 
+            top: `${proj.y - mapPosition.y}px`
+          }}></div>
+        ))}
       </div>
 
-      {/* Grande barre de vie en haut à droite pour l'utilisateur actuel */}
       {currentUser && (
         <div className="large-health-bar-container">
           <h3>Vie : {healths[currentUser]} / 100</h3>
