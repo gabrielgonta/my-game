@@ -20,7 +20,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0.52m 0.5em;
     text-align: right;
     background: transparent;
     position: relative;
@@ -82,7 +81,7 @@
 
 
 
-params {
+.params {
     margin-top: 4%;
     margin-left: -50%;
     --col-orange: #d17842;
@@ -99,17 +98,17 @@ params {
     width: 200%;
   }
 
-  params label {
+  .params label {
     padding: 18px 18px;
     transition: all 200ms;
     display: inline-block;
   }
   
-  params label input[type="radio"] {
+  .params label input[type="radio"] {
     display: none;
   }
   
-  params label::before {
+  .params label::before {
     content: "";
     display: block;
     width: 0%;
@@ -122,7 +121,7 @@ params {
     transition: all 200ms;
   }
   
-  params label:has(input:checked)::before {
+  .params label:has(input:checked)::before {
     width: 100%;
     left: 0;
     top: 25px;
@@ -180,7 +179,7 @@ params {
     border-radius: 8%;
   }
 
-.values .audio h2 {
+.values h2 {
   text-align: center;
 }
 
@@ -200,7 +199,7 @@ params {
 
 .slider {
   /* slider */
-  --slider-width: 100%;
+  --slider-width: 50%;
   --slider-height: 0.6em;
   --slider-bg: rgb(82, 82, 82);
   --slider-border-radius: 999px;
@@ -210,7 +209,7 @@ params {
   /* icon */
   --icon-margin: 2%;
   --icon-color: var(--slider-bg);
-  --icon-size: 5%;
+  --icon-size: 3%;
   margin-left: 1%;
 }
 
@@ -226,6 +225,7 @@ params {
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
+  justify-content: left;
 }
 
 .slider .volume {
@@ -266,7 +266,45 @@ params {
 }
 
 .slider .volume-percentage {
-    margin-right: 10px;
-    font-size: 14px;
-    color: var(--icon-color);
+  font-size: 26px;
+}
+
+
+
+
+
+
+
+.controles {
+  padding: 20px;
+}
+.control-item {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+.control-item label {
+  margin-right: 10px;
+}
+.key-box {
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  text-align: center;
+  line-height: 30px;
+  border: 1px solid #000;
+  cursor: pointer;
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 20px;
 }

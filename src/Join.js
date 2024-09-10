@@ -49,10 +49,10 @@ function Join() {
 
   return (
     <div className="Join">
-    <form class="container">
-        <label class="neon-btn">
-            <span class="span"></span>
-            <span class="txt">REJOINDRE</span>
+    <form className="container">
+        <label className="neon-btn">
+            <span className="span"></span>
+            <span className="txt">REJOINDRE</span>
         </label>
     </form>
       <input value={username} className='name' onChange={(e) => setUsername(e.target.value)} placeholder="PSEUDO" type="text" />
@@ -60,7 +60,7 @@ function Join() {
 
       {showButton && (
         <button className="submitButton" onClick={handleJoinRoom}>
-          <span class='ligne'>VALIDER</span>
+          <span className='ligne'>VALIDER</span>
           <svg width="30" height="10" viewBox="0 0 46 16">
             <path d="M8,0,6.545,1.455l5.506,5.506H-30V9.039H12.052L6.545,14.545,8,16l8-8Z" fill='white' transform="translate(30)"></path>
           </svg>

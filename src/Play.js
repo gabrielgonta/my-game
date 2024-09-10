@@ -19,10 +19,10 @@ function Play() {
 
   return (
     <div className="play">
-      <form class="container">
-          <label class="neon-btn">
-              <span class="span"></span>
-              <span class="txt">CHOISISSEZ UNE OPTION</span>
+      <form className="container">
+          <label className="neon-btn">
+              <span className="span"></span>
+              <span className="txt">CHOISISSEZ UNE OPTION</span>
           </label>
       </form>
       <button className="menu-button" onClick={() => navigate('/create')}>Créer</button> {/* Redirection vers Create */}

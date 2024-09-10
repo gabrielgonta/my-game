@@ -45,10 +45,10 @@ function Create() {
 
   return (
     <div className="create">
-    <form class="container">
-        <label class="neon-btn">
-            <span class="span"></span>
-            <span class="txt">CRÉER UN SALON</span>
+    <form className="container">
+        <label className="neon-btn">
+            <span className="span"></span>
+            <span className="txt">CRÉER UN SALON</span>
         </label>
     </form>
       <input value={username} className='name' onChange={(e) => setUsername(e.target.value)} placeholder="PSEUDO" type="text"/>

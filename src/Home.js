@@ -9,10 +9,10 @@ function Home() {
 
   return (
     <div className="home">
-    <form class="container">
-        <label class="neon-btn">
-            <span class="span"></span>
-            <span class="txt">MY GAME</span>
+    <form className="container">
+        <label className="neon-btn">
+            <span className="span"></span>
+            <span className="txt">MY GAME</span>
         </label>
     </form>
       <button className="menu-button" onClick={() => navigate('/play')}>Jouer</button>
