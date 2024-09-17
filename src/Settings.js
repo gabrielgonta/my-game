@@ -1,14 +1,48 @@
 // Settings.js
-import React, { useContext, useState, useRef } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './App.css';
 import './Settings.css';
-import { VolumeContext } from './App'; // Importez le contexte
+import { VolumeContext } from './App.js'; // Importez le contexte
+import { ProjectileContext } from './App.js'; // Importez le contexte
+// import KeySettings from './Controles.js';
 
 function Settings() {
     const navigate = useNavigate();
     const [selectedPage, setSelectedPage] = useState('général');
     const { volume, setVolume } = useContext(VolumeContext); // Récupérez le volume et setVolume du contexte
+    const { keyProjectile, setKeyProjectile } = useContext(ProjectileContext);
+
+
+
+    const [isOverlayVisible, setIsOverlayVisible] = useState(false);
+
+    // Charger la touche depuis localStorage si elle existe
+    useEffect(() => {
+      const savedKeyProjectile = localStorage.getItem('projectileKey');
+      if (savedKeyProjectile) {
+        setKeyProjectile(savedKeyProjectile);
+      }
+    }, []);
+  
+    // Quand on clique sur le carré, on attend que l'utilisateur presse une touche
+    const handleKeyBoxClick = () => {
+      setIsOverlayVisible(true);
+      document.addEventListener('keydown', handleKeyPress, { once: true });
+    };
+  
+    // Changer la touche et sauvegarder dans localStorage
+    const handleKeyPress = (event) => {
+      const newKeyProjectile = event.key.toUpperCase();
+      setKeyProjectile(newKeyProjectile);
+      localStorage.setItem('projectileKey', newKeyProjectile);
+      setIsOverlayVisible(false);
+    };
+
+
+
+
+
 
     const handlePageChange = (e) => {
         setSelectedPage(e.target.value);
@@ -18,59 +52,36 @@ function Settings() {
         setVolume(e.target.value); // Mettez à jour le volume via le contexte
     };
 
-
-
-
-
-    const [key, setKey] = useState('A');
-    const [isOverlayVisible, setIsOverlayVisible] = useState(false);
-    const keyRef = useRef();
-  
-    // Quand on clique sur le carré, on affiche l'overlay
-    const handleKeyBoxClick = () => {
-      setIsOverlayVisible(true);
-      document.addEventListener('keydown', handleKeyPress, { once: true });
-    };
-  
-    // Changer la touche et cacher l'overlay
-    const handleKeyPress = (event) => {
-      setKey(event.key.toUpperCase());
-      setIsOverlayVisible(false);
-    };
-
-
-
-
-
-
     const renderContent = () => {
         switch (selectedPage) {
             case 'général':
-                return <p>Paramètres généraux.</p>;
-            case 'contrôles':
                 return (
-                  <div className="contrôles">
+                  <h2>Paramètres généraux</h2>
+                );
+            case 'controles':
+                return (
+                  <div className="controles">
                     <h2>Paramètres de touches</h2>
-                    <div className="control-item">
-                      <label>Projectile:</label>
-                      <div
-                        ref={keyRef}
-                        className="key-box"
-                        onClick={handleKeyBoxClick}
-                      >
-                        {key}
-                      </div>
-                    </div>
-              
-                    {isOverlayVisible && (
-                      <div className="overlay">
-                        Pressez une touche...
-                      </div>
-                    )}
+        <div>
+            <div className="projectile">
+            <label>Projectile:</label>
+            <div className="key-box" onClick={handleKeyBoxClick}>
+                {keyProjectile}
+            </div>
+            </div>
+            {isOverlayVisible && (
+                <div className="overlay">
+                Pressez une touche...
+                </div>
+             )}
+        </div>
+                    {/* <KeySettings/> */}
                   </div>
                 );
             case 'vidéo':
-                return <p>Paramètres vidéo.</p>;
+                return (
+                  <h2>Paramètres graphiques</h2>
+                );
             case 'audio':
                 return (
                     <div className='audio'>
@@ -113,16 +124,16 @@ function Settings() {
                     />
                     Général
                 </label>
-                <label title="p.contrôles" htmlFor="p.contrôles">
+                <label title="p.controles" htmlFor="p.controles">
                     <input
-                        id="p.contrôles"
+                        id="p.controles"
                         name="page"
                         type="radio"
-                        value="contrôles"
-                        checked={selectedPage === 'contrôles'}
+                        value="controles"
+                        checked={selectedPage === 'controles'}
                         onChange={handlePageChange}
                     />
-                    Contrôles
+                    Controles
                 </label>
                 <label title="p.vidéo" htmlFor="p.vidéo">
                     <input

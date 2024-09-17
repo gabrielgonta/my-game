@@ -292,9 +292,11 @@
   display: inline-block;
   text-align: center;
   line-height: 30px;
-  border: 1px solid #000;
+  border: 1px solid white;
   cursor: pointer;
 }
+
+
 .overlay {
   position: fixed;
   top: 0;
@@ -307,4 +309,14 @@
   align-items: center;
   color: white;
   font-size: 20px;
+}
+
+.projectile {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+.projectile label {
+  margin-right: 10px;
+  margin-left: 2%;
 }

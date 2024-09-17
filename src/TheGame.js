@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ref, onValue, remove, get, update } from 'firebase/database';
 import { database } from './firebaseConfig';
 import './TheGame.css'; // Assurez-vous d'avoir ce fichier CSS pour styliser la carte, les skins et les barres de vie
+import { ProjectileContext } from './App'; // Importez ProjectileContext
 
 // Importer les images des skins
 import skin1 from './assets/skin1.png';
@@ -21,6 +22,8 @@ const skinImages = {
 };
 
 function TheGame() {
+  const keyProjectile = useContext(ProjectileContext);
+
   const location = useLocation();
   const navigate = useNavigate();
   const { code, currentUser } = location.state || {};
@@ -39,7 +42,35 @@ function TheGame() {
   const MARGIN = 100;
   const SKIN_SIZE = 70;
   const PROJECTILE_SPEED = 5; // Vitesse du projectile
-  const PROJECTILE_MAX_DISTANCE = 400; // Distance maximale avant disparition
+  const PROJECTILE_MAX_DISTANCE = 400; // Distance maximale avant disparition0
+
+
+  useEffect(() => {
+    console.log(`Projectile key: ${keyProjectile}`); // Ajoutez ce log
+    const handleKeyPress = (event) => {
+      console.log(`Key pressed: ${event.key}`); // Log pour vérifier la touche pressée
+      if (!currentUser) return;
+  
+      if (event.key === keyProjectile) {
+        // Log pour voir si la touche personnalisée est bien reconnue
+        console.log('Projectile key detected, firing projectile...');
+      }
+  
+      // Le reste du code ici...
+    };
+  
+    window.addEventListener('keydown', handleKeyPress);
+  
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [positions, mapPosition, mousePosition, currentUser, code, keyProjectile]);
+  
+
+
+
+
+
 
   useEffect(() => {
     if (!code) {
@@ -154,7 +185,7 @@ function TheGame() {
         case 'd':
           newX = (newX + speed <= MAP_WIDTH - SKIN_SIZE) ? newX + speed : MAP_WIDTH - SKIN_SIZE;
           break;
-        case 'a': // Tirer un projectile vers la souris
+        case keyProjectile: // Tirer un projectile vers la souris
           const playerPos = positions[currentUser];
           const dx = mousePosition.x - playerPos.x;
           const dy = mousePosition.y - playerPos.y;

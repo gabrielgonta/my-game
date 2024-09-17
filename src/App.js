@@ -14,13 +14,16 @@ import SignupPopup from './SignupPopup';
 import BackgroundAudio from './BackgroundAudio';
 
 export const VolumeContext = createContext();
+export const ProjectileContext = createContext();
 
 function App() {
   const [showPopup, setShowPopup] = useState(false);
   const [volume, setVolume] = useState(15);
+  const [keyProjectile, setKeyProjectile] = useState('A');
 
   return (
     <VolumeContext.Provider value={{ volume, setVolume }}>
+    <ProjectileContext.Provider value={{ keyProjectile, setKeyProjectile }}>
       <Router>
         <div className="App">
           <BackgroundAudio volume={volume} />
@@ -39,6 +42,7 @@ function App() {
           {showPopup && <SignupPopup onClose={() => setShowPopup(false)} />}
         </div>
       </Router>
+    </ProjectileContext.Provider>
     </VolumeContext.Provider>
   );
 }
